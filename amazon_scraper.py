@@ -1,16 +1,23 @@
 """
-K-Beauty Amazon Review Scraper
-- Target: Amazon US 'Korean Skincare' 검색 결과
-- 상위 500개 제품의 최근 리뷰 20개씩 수집
+K-Beauty Amazon Review Scraper v2.0
+===================================
+
+Amazon US에서 K-Beauty 제품 리뷰를 수집하는 고성능 크롤러
+
+주요 기능:
+- 상위 500개 제품 자동 검색
+- 제품당 최대 20개 리뷰 수집
+- 제품 메타데이터 수집 (가격, 평점, 판매량)
+- CAPTCHA 자동 감지 및 대응
+- 중단 시 데이터 자동 저장
 
 사용법:
-1. 먼저 Chrome을 디버그 모드로 실행:
+1. Chrome 디버그 모드 실행:
    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
+2. Chrome에서 Amazon 로그인
+3. python amazon_scraper.py 실행
 
-2. 열린 Chrome에서 Amazon 로그인
-
-3. 스크립트 실행:
-   python3 amazon_scraper.py
+출력: results/amazon_reviews.csv, results/amazon_products.csv
 """
 
 import csv

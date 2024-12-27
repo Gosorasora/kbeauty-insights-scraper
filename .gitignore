@@ -23,13 +23,11 @@ wheels/
 .installed.cfg
 *.egg
 
-# 크롤링 결과 (Git에 포함하지 않음)
+# 크롤링 결과 (용량이 큰 데이터 파일)
 results/
+*.csv
 
-# 문서 (Git에 포함하지 않음)
-docs/
-
-# Chrome 프로필 (Git에 포함하지 않음)
+# Chrome 프로필 (개인 정보 포함)
 chrome_profile/
 
 # 디버그 파일
@@ -48,6 +46,16 @@ debug_*.png
 .AppleDouble
 .LSOverride
 
-# 환경 변수
+# 환경 변수 및 민감한 정보
 .env
 .env.local
+*.tfvars
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Azure 관련 민감한 파일
+*.key
+*.pem
+*.crt
