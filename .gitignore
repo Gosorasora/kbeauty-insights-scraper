@@ -27,6 +27,9 @@ wheels/
 results/
 *.csv
 
+# 문서 (팀 내부 문서)
+docs/
+
 # Chrome 프로필 (개인 정보 포함)
 chrome_profile/
 
