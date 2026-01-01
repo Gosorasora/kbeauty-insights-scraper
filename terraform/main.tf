@@ -145,14 +145,14 @@ resource "azurerm_storage_container" "clean_data" {
 resource "azurerm_cognitive_account" "openai" {
   name                = "openai-${local.resource_prefix}"
   resource_group_name = azurerm_resource_group.main.name
-  location            = "eastus"  # OpenAI 지원 리전 (Korea Central 미지원)
-  kind                = "OpenAI"  # OpenAI 서비스 타입
-  sku_name            = "S0"      # 표준 종량제 (사용한 만큼 지불)
+  location            = "koreacentral"  # Korea Central로 변경 (구독 정책 준수)
+  kind                = "OpenAI"
+  sku_name            = "S0"
   
   tags = merge(local.tags, {
     Service = "Azure OpenAI"
-    Region  = "East US"
-    Purpose = "AI Model Inference"  # AI 모델 추론용
+    Region  = "Korea Central"
+    Purpose = "AI Model Inference"
   })
 }
 
@@ -226,9 +226,10 @@ resource "azurerm_application_insights" "main" {
   name                = "appi-${local.resource_prefix}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
-  application_type    = "web"  # 웹 애플리케이션 타입
+  application_type    = "web"
+  workspace_id        = azurerm_log_analytics_workspace.main.id  # workspace_id 유지
   
-  retention_in_days = 30  # 데이터 보존 기간 (비용 절감을 위해 30일로 제한)
+  retention_in_days = 30
   
   tags = merge(local.tags, {
     Service = "Application Insights"

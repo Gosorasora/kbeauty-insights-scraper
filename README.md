@@ -1,16 +1,53 @@
-# K-Beauty 리테일 인사이트 분석
+# K-Beauty AI 학습용 데이터 수집 시스템
 
-Amazon K-Beauty 제품 리뷰 데이터를 수집하고 Azure OpenAI 기반 RAG 시스템으로 분석하는 프로젝트입니다.
+YouTube에서 K-Beauty 관련 바이럴 콘텐츠를 수집하여 AI 모델 학습용 데이터셋을 구축하는 시스템입니다.  
+**NEW**: SRS 요구사항 기반 YouTube 메가히트 탐지 및 학습 데이터셋 생성!
 
 ## 🎯 프로젝트 목표
 
-해외 고객들의 K-Beauty 제품 리뷰 데이터를 AI가 분석하여 **글로벌 고객이 K-Beauty 브랜드에 기대하는 포인트**를 자동으로 알려주는 에이전트 개발
+1. **AI 학습용 데이터셋 구축**: YouTube API를 통해 K-Beauty 관련 영상 데이터를 수집하고 피처 엔지니어링을 통해 AI 모델 학습에 최적화된 CSV 데이터셋 생성
+2. **메가히트 예측 모델**: View Velocity, VPV, Engagement Rate 등 파생 피처를 활용하여 바이럴 영상을 조기에 예측할 수 있는 학습 데이터 제공
+3. **일별 배치 시스템**: 매일 자동으로 최신 트렌드 데이터를 수집하여 지속적으로 학습 데이터셋을 업데이트
 
 ## 🚀 빠른 시작
 
-### 버전 선택
+### 🔥 NEW: AI 학습용 데이터 수집 시스템 (권장)
 
-프로젝트는 3가지 버전으로 제공됩니다:
+SRS 요구사항 기반으로 새롭게 구현된 YouTube 메가히트 탐지 및 학습 데이터셋 구축 시스템입니다.
+
+```bash
+# 1. 환경 설정
+# .env 파일에 YouTube API 키 설정
+export YOUTUBE_API_KEYS="your_api_key1,your_api_key2"
+
+# 2. 패키지 설치
+pip install -r requirements.txt
+
+# 3. 시스템 테스트
+python test_training_system.py
+
+# 4. 일별 데이터 수집 실행
+python run_training_collection.py
+
+# 5. 특정 날짜 수집
+python run_training_collection.py --date 2026-01-01
+
+# 6. 배치 수집 (여러 날짜)
+python run_training_collection.py --start-date 2025-12-28 --end-date 2025-12-31
+```
+
+**주요 기능**:
+- 🎯 YouTube Data API v3 기반 3가지 소스 데이터 수집
+  - 거시 트렌드 (인기 급상승 차트)
+  - 키워드 발굴 (Korean Skincare, K-Beauty 등)
+  - 채널 성과 (주요 뷰티 인플루언서)
+- ⚙️ 피처 엔지니어링 (View Velocity, VPV, Engagement Rate)
+- 📊 CSV 데이터셋 생성 (UTF-8-SIG, AI 학습 최적화)
+- 🔄 일별 배치 스케줄링 및 통계 리포팅
+
+### 기존 RAG 시스템 (레거시)
+
+기존에 구현된 Amazon 리뷰 기반 RAG 시스템도 포함되어 있습니다:
 
 | 버전 | 비용 | 용도 | 문서 |
 |------|------|------|------|
@@ -18,237 +55,284 @@ Amazon K-Beauty 제품 리뷰 데이터를 수집하고 Azure OpenAI 기반 RAG 
 | **v2 (최적화)** | $120-145/월 | 공모전, MVP, 5만개+ 데이터 | [V2_OPTIMIZED.md](docs/V2_OPTIMIZED.md) |
 | **v3 (프로덕션)** | $700-1,000/월 | 상용 서비스 | [V3_PRODUCTION.md](docs/V3_PRODUCTION.md) |
 
-**권장**: 공모전 준비 중이라면 **v2 (Cognitive Search)** 추천합니다.
+## 🔥 AI 학습용 데이터 수집 시스템 상세
 
-### v1: 로컬 개발 (현재 권장)
+### SRS 요구사항 기반 설계
 
-```bash
-# 1. 라이브러리 설치
-pip install -r requirements_azure.txt
+본 시스템은 사용자가 제공한 상세한 SRS(Software Requirements Specification) 요구사항을 바탕으로 설계되었습니다:
 
-# 2. 환경 변수 설정
-cp .env.example .env
-# .env 파일에 Azure OpenAI 정보 입력
+- **목표**: 미국 시장 내 K-Beauty 관련 급상승 동영상을 조기에 식별
+- **3가지 데이터 소스**: 거시 트렌드, 키워드 발굴, 채널 성과 분석
+- **피처 엔지니어링**: View Velocity, VPV, Engagement Rate 등 바이럴 예측 지표
+- **CSV 스키마**: AI 모델 학습에 최적화된 17개 컬럼 구조
 
-# 3. 데이터 전처리
-python preprocess_data.py
+### 시스템 아키텍처
 
-# 4. Vector DB 구축
-python build_vector_db.py
-
-# 5. RAG 에이전트 실행
-python azure_rag_agent.py
+```mermaid
+graph TB
+    subgraph "Data Sources"
+        YT1[YouTube Trending]
+        YT2[YouTube Search]
+        YT3[YouTube Channels]
+    end
+    
+    subgraph "Collection Layer"
+        YTC[YouTube Training Data Collector]
+        QM[API Quota Manager]
+    end
+    
+    subgraph "Processing Layer"
+        FE[Feature Engineering]
+        DP[Data Processing]
+    end
+    
+    subgraph "Output Layer"
+        CSV[CSV Dataset]
+        STATS[Collection Stats]
+    end
+    
+    YT1 --> YTC
+    YT2 --> YTC
+    YT3 --> YTC
+    
+    YTC --> QM
+    YTC --> FE
+    FE --> DP
+    DP --> CSV
+    DP --> STATS
 ```
 
-**비용**: $10-30/월 (Azure OpenAI API만)  
-**상세 가이드**: [V1_LOCAL_DEV.md](docs/V1_LOCAL_DEV.md)
+### 핵심 컴포넌트
 
-### v2: Azure 배포 (공모전 제출용)
+1. **YouTube Training Data Collector** (`src/collectors/youtube_training_data_collector.py`)
+   - YouTube Data API v3 통합
+   - 3가지 소스 데이터 수집 (거시 트렌드, 키워드 발굴, 채널 성과)
+   - API 할당량 관리 및 키 로테이션
+   - 피처 엔지니어링 (View Velocity, VPV, Engagement Rate)
+
+2. **Training System** (`src/viral_detection_system.py`)
+   - 일별 배치 스케줄링
+   - 데이터 품질 관리
+   - CSV 데이터셋 생성 (UTF-8-SIG)
+   - 수집 통계 및 리포팅
+
+### CSV 데이터셋 스키마
+
+생성되는 CSV 파일은 다음 17개 컬럼으로 구성됩니다:
+
+| 컬럼명 | 타입 | 설명 |
+|--------|------|------|
+| `collection_date` | string | 수집 날짜 (YYYY-MM-DD) |
+| `video_id` | string | YouTube 영상 ID |
+| `title` | string | 영상 제목 |
+| `channel_name` | string | 채널명 |
+| `upload_date` | string | 업로드 날짜 (ISO format) |
+| `duration_sec` | int | 영상 길이 (초) |
+| `subscriber_count` | int | 채널 구독자 수 |
+| `view_count` | int | 조회수 |
+| `like_count` | int | 좋아요 수 |
+| `comment_count` | int | 댓글 수 |
+| `view_velocity` | float | 시간당 조회수 증가량 |
+| `vpv_ratio` | float | 구독자 대비 조회수 비율 |
+| `engagement_rate` | float | 조회수 대비 반응율 |
+| `top_comments_text` | string | 상위 댓글 (파이프 구분) |
+| `description_keywords` | string | 설명란 키워드 (쉼표 구분) |
+| `is_trending_category` | int | 트렌딩 차트 진입 여부 (1/0) |
+| `source_type` | string | 데이터 소스 타입 |
+
+### 실행 모드
 
 ```bash
-# Terraform으로 자동 배포
-cd terraform
-cp variables.tfvars.example variables.tfvars
-# variables.tfvars 편집
+# 일별 수집 (오늘 날짜)
+python run_training_collection.py
 
-terraform init
-terraform apply -var-file="variables.tfvars"
+# 특정 날짜 수집
+python run_training_collection.py --date 2026-01-01
 
-# Cognitive Search 인덱스 생성
-python migrate_to_cognitive_search.py
+# 배치 수집 (날짜 범위)
+python run_training_collection.py --start-date 2025-12-28 --end-date 2025-12-31
+
+# 시스템 테스트
+python test_training_system.py
 ```
 
-**비용**: $120-145/월 (Azure AI Search 포함)  
-**성능**: 검색 20-50ms, 동시 사용자 50명+  
-**상세 가이드**: [V2_OPTIMIZED.md](docs/V2_OPTIMIZED.md)
+### 환경 설정
+
+`.env` 파일 예시:
+```bash
+# YouTube Data API v3 키 (필수)
+YOUTUBE_API_KEYS=your_api_key_1,your_api_key_2
+
+# 수집 설정
+COLLECTION_SCHEDULE=daily
+BATCH_SIZE=100
+OUTPUT_DIRECTORY=results
+MIN_VIEW_COUNT=1000
+
+# 로깅 설정
+LOG_LEVEL=INFO
+LOG_FILE=viral_detection.log
+```
 
 ## 📊 수집 데이터
 
-- **리뷰 수**: 5,686개
-- **제품 수**: 280개
-- **데이터 소스**: Amazon US "Korean Skincare"
-- **수집 기간**: 2025-12-22
+### 🔥 NEW: AI 학습용 데이터셋
+- **데이터 소스**: YouTube Data API v3
+- **수집 방식**: 3가지 소스 (거시 트렌드, 키워드 발굴, 채널 성과)
+- **타겟 키워드**: Korean Skincare, Glass Skin, K-Beauty Routine, Tirtir, Biodance, Anua 등
+- **파일 형식**: `youtube_viral_dataset_v1_{YYYYMMDD}.csv`
+- **인코딩**: UTF-8-SIG (Excel 호환)
+- **수집 주기**: 일별 배치 (설정 가능)
 
-### 데이터 파일
-- `results/amazon_reviews.csv` - 원본 리뷰 데이터
-- `results/amazon_reviews_clean.csv` - 전처리된 리뷰 데이터
-- `results/amazon_products.csv` - 제품 메타데이터
-
-## 🏗️ 시스템 아키텍처
-
-```
-User ──HTTPS──▶ App Service ──Vector Query──▶ AI Search
-                     │
-                     └──API Call──▶ Azure OpenAI (East US)
-```
-
-**핵심 구성**:
-- **App Service (B1)**: RAG Agent 실행 (Korea Central)
-- **Azure AI Search**: Vector 검색 엔진 (Korea Central)  
-- **Azure OpenAI**: 임베딩 + GPT 모델 (East US)
-- **Blob Storage**: 데이터 저장 (Korea Central)
-
-## 💡 주요 기능
-
-### ✅ Phase 1: 데이터 수집 (완료)
-- Amazon 제품 검색 및 리뷰 수집
-- 별점, 유용함 투표, 검증된 구매 정보 수집
-- CSV 형식으로 저장
-- Ctrl+C 중단 시 자동 저장
-
-### ✅ Phase 2: RAG 시스템 (완료)
-- Azure OpenAI 기반 임베딩 생성
-- ChromaDB Vector Database 구축
-- 자연어 질문 답변 AI 에이전트
-- 관련 리뷰 검색 및 인사이트 제공
-
-### 🔄 Phase 3-6: 진행 예정
-- 고급 텍스트 분석 (감성 분석, 토픽 모델링)
-- 시각화 대시보드
-- 데이터 소스 확장
-- 자동화 및 스케줄링
+### 데이터 품질 관리
+- **중복 제거**: video_id 기준 자동 중복 제거
+- **데이터 검증**: 필수 필드 존재 여부 확인
+- **품질 메트릭**: 트렌딩 비율, 평균 조회수, 평균 참여율 제공
 
 ## 📁 프로젝트 구조
 
 ```
 .
-├── amazon_scraper.py              # Amazon 크롤러
-├── preprocess_data.py             # 데이터 전처리
-├── build_vector_db.py             # Vector DB 구축
-├── azure_rag_agent.py             # RAG AI 에이전트
-├── analyze_trends.py              # 기본 트렌드 분석
-├── requirements.txt               # 크롤러 의존성
-├── requirements_azure.txt         # Azure RAG 의존성
-├── .env.example                   # 환경 변수 예시
-├── README.md                      # 프로젝트 소개
-├── results/                       # 크롤링 결과 (gitignore)
-│   ├── amazon_reviews.csv
-│   ├── amazon_reviews_clean.csv
-│   └── amazon_products.csv
-├── chroma_db/                     # Vector Database (gitignore)
-├── docs/                          # 문서 (gitignore)
-│   ├── PROJECT_STATUS.md          # 프로젝트 현황
-│   ├── TODO.md                    # 작업 목록
-│   ├── IMPLEMENTATION_GUIDE.md    # 구현 가이드
-│   ├── AZURE_SETUP_GUIDE.md       # Azure 설정 가이드
-│   └── PROJECT_SUMMARY.md         # 작업 히스토리
-└── chrome_profile/                # Chrome 프로필 (gitignore)
+├── 🔥 AI 학습용 데이터 수집 시스템 (메인)
+│   ├── src/
+│   │   ├── collectors/
+│   │   │   └── youtube_training_data_collector.py  # YouTube 학습 데이터 수집기
+│   │   └── viral_detection_system.py               # 메인 통합 시스템
+│   ├── run_training_collection.py                  # 실행 스크립트
+│   ├── test_training_system.py                     # 시스템 테스트
+│   └── .env                                        # 환경 설정
+│
+├── 📋 스펙 및 설계
+│   └── .kiro/specs/viral-detection-system/
+│       ├── requirements.md                         # SRS 요구사항 명세서
+│       └── design.md                              # 설계 문서
+│
+├── 🏗️ 인프라 (Terraform)
+│   └── terraform/
+│       ├── main.tf                                # Azure 인프라 정의
+│       └── variables.tfvars.example               # 변수 예시
+│
+├── 📚 문서
+│   ├── docs/guides/                               # 가이드 문서
+│   ├── docs/V1_LOCAL_DEV.md                      # 기존 RAG 시스템 v1
+│   ├── docs/V2_OPTIMIZED.md                      # 기존 RAG 시스템 v2
+│   └── docs/V3_PRODUCTION.md                     # 기존 RAG 시스템 v3
+│
+└── 📊 데이터
+    ├── results/                                   # AI 학습용 CSV 데이터셋
+    │   └── youtube_viral_dataset_v1_YYYYMMDD.csv
+    └── viral_results/                             # 기존 바이럴 감지 결과 (레거시)
 ```
 
 ## 🤖 사용 예시
 
-### 데이터 수집 (Chrome Remote Debugging)
-
-```bash
-# Chrome 디버그 모드 실행
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --remote-debugging-port=9222 \
-  --user-data-dir=/tmp/chrome_debug_profile
-
-# Amazon 로그인 후 크롤러 실행
-python3 amazon_scraper.py
-```
-
-### RAG AI 에이전트 사용
+### 🔥 AI 학습용 데이터 수집
 
 ```python
-from azure_rag_agent import KBeautyRAGAgent
+from src.viral_detection_system import YouTubeTrainingSystem, load_config_from_env
 
-# 에이전트 초기화
-agent = KBeautyRAGAgent()
+# 시스템 초기화
+config = load_config_from_env()
+system = YouTubeTrainingSystem(config)
 
-# 질문하기
-agent.ask("요즘 미국에서 인기 있는 진정 토너는 무엇인가요?")
-agent.ask("Snail Mucin 제품에 대한 고객 반응은 어떤가요?")
-agent.ask("건조한 피부에 좋은 K-Beauty 제품을 추천해주세요.")
+# 일별 데이터 수집
+stats = await system.run_daily_collection()
+print(f"수집된 영상: {stats.total_videos_processed}개")
+print(f"트렌딩 영상: {stats.trending_videos_count}개")
+print(f"CSV 파일: {stats.csv_file_path}")
 
-# 대화형 모드
-agent.interactive_mode()
+# 배치 수집 (여러 날짜)
+date_range = ["2025-12-28", "2025-12-29", "2025-12-30"]
+all_stats = await system.run_batch_collection(date_range)
 ```
 
-## 📈 예시 질문
+### 생성된 CSV 데이터 활용
 
-1. 요즘 미국에서 인기 있는 진정 토너는 무엇인가요?
-2. Snail Mucin 제품에 대한 고객 반응은 어떤가요?
-3. 건조한 피부에 좋은 K-Beauty 제품을 추천해주세요.
-4. Niacinamide 성분이 들어간 제품 중 평점이 높은 것은?
-5. 40대 이상 고객들이 선호하는 제품은?
-6. 최근 3개월간 급상승한 성분 트렌드는?
-7. 경쟁사 대비 아모레퍼시픽 제품의 강점은?
+```python
+import pandas as pd
+
+# CSV 파일 로드
+df = pd.read_csv("results/youtube_viral_dataset_v1_20260101.csv")
+
+# 기본 통계
+print(f"총 영상 수: {len(df)}")
+print(f"트렌딩 영상 비율: {df['is_trending_category'].mean():.2%}")
+print(f"평균 조회수: {df['view_count'].mean():,.0f}")
+print(f"평균 참여율: {df['engagement_rate'].mean():.4f}")
+
+# 고성과 영상 필터링
+high_performance = df[
+    (df['view_velocity'] > df['view_velocity'].quantile(0.9)) |
+    (df['vpv_ratio'] > 2.0) |
+    (df['engagement_rate'] > 0.05)
+]
+print(f"고성과 영상: {len(high_performance)}개")
+```
 
 ## 🛠️ 기술 스택
 
-### 데이터 수집
-- Python 3.9+
-- Selenium 4.39.0
-- BeautifulSoup4
-- Pandas
-
-### RAG 시스템
-- Azure OpenAI (GPT-4, text-embedding-ada-002)
-- ChromaDB (Vector Database)
-- LangChain
-- OpenAI Python SDK
+### 🔥 AI 학습용 데이터 수집 시스템
+- **API 통합**: YouTube Data API v3
+- **비동기 처리**: AsyncIO, aiohttp
+- **데이터 처리**: Pandas, CSV (UTF-8-SIG)
+- **피처 엔지니어링**: 커스텀 알고리즘 (View Velocity, VPV, Engagement Rate)
+- **아키텍처**: 모듈화된 컴포넌트 기반 설계
 
 ## 💰 비용 예상
 
-### Azure OpenAI 사용 시
-- **초기 구축**: $1 (임베딩 생성)
-- **질문당**: $0.09 (GPT-4 기준)
-- **월간 운영** (100 질문/일): $270
+### 🔥 AI 학습용 데이터 수집 시스템
+- **YouTube API**: $0 (일일 할당량 10,000 units 내)
+- **서버 운영**: $0 (로컬 실행 또는 최소 클라우드 인스턴스)
+- **데이터 저장**: $0 (로컬 CSV 파일)
+- **총 예상 비용**: $0/월 (API 할당량 내 사용시)
 
-### 비용 절감 방법
-- GPT-3.5-turbo 사용 (비용 1/10)
-- 자주 묻는 질문 캐싱
-- 로컬 LLM 사용 (Ollama)
+## 📈 예시 데이터 및 활용
+
+### 🔥 생성되는 학습 데이터셋 예시
+```csv
+collection_date,video_id,title,channel_name,upload_date,duration_sec,subscriber_count,view_count,like_count,comment_count,view_velocity,vpv_ratio,engagement_rate,top_comments_text,description_keywords,is_trending_category,source_type
+2026-01-01,dQw4w9WgXcQ,Korean Glass Skin Routine,Beauty Guru,2025-12-31T10:00:00Z,420,150000,500000,25000,1200,20833.33,3.33,0.0524,love this routine|where to buy|amazing results,korean skincare glass skin routine,1,macro_trend
+```
+
+### AI 모델 학습 활용 방안
+1. **바이럴 예측 모델**: `is_trending_category`를 타겟으로 하는 분류 모델
+2. **조회수 예측**: `view_count`를 예측하는 회귀 모델
+3. **참여율 분석**: `engagement_rate` 기반 콘텐츠 품질 평가
+4. **트렌드 분석**: 시계열 데이터로 트렌드 변화 패턴 학습
 
 ## 📝 상세 문서
 
-### 버전별 가이드
-- **v1 (로컬 개발)**: [V1_LOCAL_DEV.md](docs/V1_LOCAL_DEV.md) - 로컬 환경 설정 및 개발
-- **v2 (최적화)**: [V2_OPTIMIZED.md](docs/V2_OPTIMIZED.md) - Azure 배포 (공모전/MVP)
-- **v3 (프로덕션)**: [V3_PRODUCTION.md](docs/V3_PRODUCTION.md) - 상용 서비스 아키텍처
-
-### 프로젝트 문서
-- **비용 비교**: [COST_COMPARISON.md](docs/COST_COMPARISON.md) - 3가지 버전 비용 비교
-- **아키텍처**: [ARCHITECTURE.md](docs/ARCHITECTURE.md) - 시스템 아키텍처 상세
-- **Azure 설정**: [AZURE_SETUP_GUIDE.md](docs/AZURE_SETUP_GUIDE.md) - Azure OpenAI 설정
-- **프로젝트 현황**: [PROJECT_STATUS.md](docs/PROJECT_STATUS.md) - 완료/진행 상황
-- **작업 목록**: [TODO.md](docs/TODO.md) - 우선순위별 작업
-- **프로젝트 요약**: [PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md) - 전체 히스토리
+### 🔥 AI 학습용 데이터 수집 시스템
+- **SRS 요구사항 명세**: [.kiro/specs/viral-detection-system/requirements.md](.kiro/specs/viral-detection-system/requirements.md)
+- **설계 문서**: [.kiro/specs/viral-detection-system/design.md](.kiro/specs/viral-detection-system/design.md)
+- **시스템 테스트**: `test_training_system.py`
+- **실행 가이드**: `run_training_collection.py --help`
 
 ## 🎯 공모전 어필 포인트
 
-### 기술적 강점
-1. ✅ **실시간 데이터**: 직접 수집한 최신 리뷰 데이터
-2. ✅ **Azure 기반 RAG**: 엔터프라이즈급 AI 시스템
-3. ✅ **확장 가능성**: 모듈화된 구조
-4. 🔄 **자동화**: 지속적 업데이트 (진행 예정)
-
-### 비즈니스 가치
-1. 🔄 **트렌드 예측**: 성분/제형 트렌드 조기 발견
-2. 🔄 **경쟁 분석**: 아모레퍼시픽 vs 경쟁사 비교
-3. 🔄 **제품 개발**: 고객 니즈 기반 신제품 기획
-4. 🔄 **마케팅**: 효과적인 메시지 포인트 도출
+### 🔥 NEW: AI 학습용 데이터 수집 시스템
+1. ✅ **SRS 기반 설계**: 상세한 요구사항 명세서를 바탕으로 한 체계적 개발
+2. ✅ **실시간 트렌드 데이터**: YouTube API를 통한 최신 K-Beauty 트렌드 수집
+3. ✅ **피처 엔지니어링**: View Velocity, VPV, Engagement Rate 등 바이럴 예측 지표
+4. ✅ **AI 학습 최적화**: 머신러닝 모델 학습에 최적화된 CSV 데이터셋 생성
+5. ✅ **확장 가능성**: 모듈화된 구조로 다양한 플랫폼 확장 가능
 
 ## 📊 프로젝트 진행률
 
-- ✅ Phase 1: 데이터 수집 (100%)
-- ✅ Phase 2: RAG 시스템 (100%)
-- 🔄 Phase 3: 고급 분석 (0%)
-- 🔄 Phase 4: 시각화 (0%)
+- ✅ Phase 1: 기존 RAG 시스템 (100%)
+- ✅ **🔥 Phase 2: AI 학습용 데이터 수집 시스템 (100%)**
+- 🔄 Phase 3: AI 모델 학습 및 예측 (0%)
+- 🔄 Phase 4: 실시간 모니터링 대시보드 (0%)
 
-**전체 진행률**: 50%
-
-## 🔗 참고 자료
-
-- [Azure OpenAI 공식 문서](https://learn.microsoft.com/azure/ai-services/openai/)
-- [ChromaDB 문서](https://docs.trychroma.com/)
-- [LangChain 문서](https://python.langchain.com/)
+**전체 진행률**: 50% (AI 학습용 데이터 수집 시스템 완성으로 대폭 향상!)
 
 ---
 
-**프로젝트**: 아모레퍼시픽 K-Beauty 인사이트 분석  
-**작성일**: 2025.12  
-**GitHub**: https://github.com/Gosorasora/kbeauty-insights-scraper  
-**최종 업데이트**: 2025-12-24
+**프로젝트**: K-Beauty AI 학습용 데이터 수집 시스템  
+**최신 업데이트**: 2026-01-01 - YouTube 메가히트 탐지 및 학습 데이터셋 구축 시스템 완성  
+**GitHub**: https://github.com/Gosorasora/kbeauty-insights-scraper
+
+### 기존 RAG 시스템 문서 (레거시)
+- **v1 (로컬 개발)**: [V1_LOCAL_DEV.md](docs/V1_LOCAL_DEV.md)
+- **v2 (최적화)**: [V2_OPTIMIZED.md](docs/V2_OPTIMIZED.md)
+- **v3 (프로덕션)**: [V3_PRODUCTION.md](docs/V3_PRODUCTION.md)

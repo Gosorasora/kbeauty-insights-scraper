@@ -23,18 +23,10 @@ wheels/
 .installed.cfg
 *.egg
 
-# 크롤링 결과 (용량이 큰 데이터 파일)
-results/
-*.csv
+# YouTube AI 학습용 데이터셋 (용량이 클 수 있음)
+results/*.csv
 
-# 문서 (팀 내부 문서)
-docs/
-
-# Chrome 프로필 (개인 정보 포함)
-chrome_profile/
-
-# 디버그 파일
-debug_*.png
+# 로그 파일
 *.log
 
 # IDE
@@ -49,16 +41,17 @@ debug_*.png
 .AppleDouble
 .LSOverride
 
-# 환경 변수 및 민감한 정보
-.env
-.env.local
+# Terraform (실제 값이 있는 경우만)
 *.tfvars
 *.tfstate
 *.tfstate.backup
 .terraform/
-.terraform.lock.hcl
 
-# Azure 관련 민감한 파일
+# 인증서 및 키
 *.key
 *.pem
 *.crt
+
+# 캐시
+.cache/
+.pytest_cache/

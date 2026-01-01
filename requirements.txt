@@ -1,21 +1,15 @@
-# 데이터 수집 (개발용)
-selenium>=4.15.0
-undetected-chromedriver>=3.5.4
-beautifulsoup4>=4.12.0
-fake-useragent>=1.4.0
+# YouTube AI 학습용 데이터 수집 시스템
+# =======================================
 
-# Azure 서비스
-azure-search-documents>=11.4.0
-azure-identity>=1.15.0
-openai>=1.3.0
+# 비동기 HTTP 클라이언트 (YouTube API 호출)
+aiohttp>=3.9.0
+certifi>=2025.11.12
 
-# 웹 애플리케이션
-flask>=3.0.0
-gunicorn>=21.2.0
-redis>=5.0.0
-
-# 데이터 처리
-pandas>=2.1.0
-numpy>=1.24.0
+# 환경 변수 관리
 python-dotenv>=1.0.0
-tqdm>=4.66.0
+
+# 데이터 처리 (선택사항 - 분석용)
+# pandas>=2.1.0  # analyze_dataset.py에서 사용하지 않음
+
+# 유틸리티
+python-dateutil>=2.8.2
